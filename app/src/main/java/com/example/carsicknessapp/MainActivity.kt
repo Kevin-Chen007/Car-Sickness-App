@@ -1,6 +1,5 @@
 package com.example.carsicknessapp
 
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -28,7 +27,14 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
+        accelerometer =
+            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        setContent {
+            Greeting()
+        }
     }
 
     override fun onResume() {
