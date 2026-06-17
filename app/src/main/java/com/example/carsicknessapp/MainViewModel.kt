@@ -12,20 +12,22 @@ class MainViewModel (
 
     var xAcceleration = 0f
         private set
-    var yAcceleration = 0f
+    var forwardAcceleration = 0f
         private set
 
     var ballX by mutableFloatStateOf(0f)
         private set
 
-    var ballY by mutableFloatStateOf(0f)
+    var ballForward by mutableFloatStateOf(0f)
         private set
+
+
 
     init {
         accelerationSensor.startListening()
         accelerationSensor.setOnSensorValuesChangedListener { values ->
             xAcceleration = values[0]
-            yAcceleration = values[1]
+            forwardAcceleration = (values[1] + values[2]) / 2f
 
             rawDataProcessing()
         }
@@ -34,7 +36,7 @@ class MainViewModel (
     private fun rawDataProcessing(){
 
         ballX = dataFilter(xAcceleration) * 10f
-        ballY = dataFilter(yAcceleration) * -10f
+        ballForward = dataFilter(forwardAcceleration) * -10f
     }
 
     private fun dataFilter(data: Float): Float{

@@ -24,7 +24,7 @@ fun Screen(viewModel: MainViewModel) {
             modifier = Modifier
                 .offset(
                     x = viewModel.ballX.dp,
-                    y = viewModel.ballY.dp
+                    y = viewModel.ballForward.dp
                 )
                 .size(50.dp)
                 .background(Color.Red)
