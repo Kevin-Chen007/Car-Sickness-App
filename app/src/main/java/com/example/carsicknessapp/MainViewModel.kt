@@ -1,5 +1,6 @@
 package com.example.carsicknessapp
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
@@ -15,11 +16,18 @@ class MainViewModel (
     var forwardAcceleration = 0f
         private set
 
-    var ballX by mutableFloatStateOf(0f)
+    var ballX = 0f
         private set
 
-    var ballForward by mutableFloatStateOf(0f)
+    var ballForward = 0f
         private set
+    var previousReading: Float? = null
+    private set
+
+    var alpha = 0.8f
+    private set
+
+    var onMotionUpdate: ((Float, Float) -> Unit)? = null
 
 
 
@@ -29,21 +37,33 @@ class MainViewModel (
             xAcceleration = values[0]
             forwardAcceleration = (values[1] + values[2]) / 2f
 
-            rawDataProcessing()
+            updateBall()
         }
     }
 
-    private fun rawDataProcessing(){
+    private fun updateBall() {
+        val targetX = lowPassFilter(xAcceleration) * 10f
+        val targetForward = lowPassFilter(forwardAcceleration) * -20f
 
-        ballX = dataFilter(xAcceleration) * 10f
-        ballForward = dataFilter(forwardAcceleration) * -10f
+        ballX += (targetX - ballX) * 0.8f
+        ballForward += (targetForward - ballForward) * 0.8f
+
+        MotionBus.motionFlow.tryEmit(ballX to ballForward)
     }
 
-    private fun dataFilter(data: Float): Float{
-        return if (abs(data) < 0.4f){
-            0f
-        } else
-            data
+
+    private fun lowPassFilter(curr: Float): Float{
+        val previous = previousReading
+
+        if (previous == null){
+            previousReading = curr
+            return curr
+        }
+        else{
+            val output = previous + alpha * (curr - previous)
+            previousReading = curr
+            return output
+        }
     }
 
     override fun onCleared() {

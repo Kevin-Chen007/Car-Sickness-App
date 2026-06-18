@@ -1,33 +1,47 @@
 package com.example.carsicknessapp
 
-import androidx.compose.foundation.layout.Box
+
+import android.content.Intent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.background
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 
 
 @Composable
 fun Screen(viewModel: MainViewModel) {
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    val context = LocalContext.current
 
-        Box(
-            modifier = Modifier
-                .offset(
-                    x = viewModel.ballX.dp,
-                    y = viewModel.ballForward.dp
-                )
-                .size(50.dp)
-                .background(Color.Red)
-        )
+    Column (
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+
+
+        Button(
+            onClick = {
+                val intent = Intent(context, OverlayService::class.java)
+                ContextCompat.startForegroundService(context, intent)
+            }
+        ) {
+            Text("Start Overlay")
+        }
+
+        Button(
+            onClick = {
+                val intent = Intent(context, OverlayService::class.java)
+                context.stopService(intent)
+            }
+        ) {
+            Text("Stop Overlay")
+        }
     }
 }
