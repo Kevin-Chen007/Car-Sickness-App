@@ -24,7 +24,9 @@ class MainViewModel (
     var previousReading: Float? = null
     private set
 
-    var alpha = 0.8f
+
+
+    var alpha = 0.5f
     private set
 
     var onMotionUpdate: ((Float, Float) -> Unit)? = null
@@ -35,15 +37,20 @@ class MainViewModel (
         accelerationSensor.startListening()
         accelerationSensor.setOnSensorValuesChangedListener { values ->
             xAcceleration = values[0]
-            forwardAcceleration = (values[1] + values[2]) / 2f
+            forwardAcceleration = if (abs(values[1]) > abs(values[2])){
+                values[1]
+            }
+            else {
+                values[2]
+            }
 
             updateBall()
         }
     }
 
     private fun updateBall() {
-        val targetX = lowPassFilter(xAcceleration) * 10f
-        val targetForward = lowPassFilter(forwardAcceleration) * -20f
+        val targetX = lowPassFilter(xAcceleration) * -50f
+        val targetForward = lowPassFilter(forwardAcceleration) * -50f
 
         ballX += (targetX - ballX) * 0.8f
         ballForward += (targetForward - ballForward) * 0.8f
@@ -52,18 +59,17 @@ class MainViewModel (
     }
 
 
-    private fun lowPassFilter(curr: Float): Float{
-        val previous = previousReading
+    private fun lowPassFilter(curr: Float): Float {
+        val prev = previousReading
 
-        if (previous == null){
+        if (prev == null) {
             previousReading = curr
             return curr
         }
-        else{
-            val output = previous + alpha * (curr - previous)
-            previousReading = curr
-            return output
-        }
+
+        val output = prev + alpha * (curr - prev)
+        previousReading = output   // <-- FIX
+        return output
     }
 
     override fun onCleared() {
