@@ -24,6 +24,9 @@ class MainViewModel (
     var previousReading: Float? = null
     private set
 
+    var sensitivity = 50f
+        private set
+
 
 
     var alpha = 0.5f
@@ -49,8 +52,8 @@ class MainViewModel (
     }
 
     private fun updateBall() {
-        val targetX = lowPassFilter(xAcceleration) * -50f
-        val targetForward = lowPassFilter(forwardAcceleration) * -50f
+        val targetX = lowPassFilter(xAcceleration) * -sensitivity
+        val targetForward = lowPassFilter(forwardAcceleration) * -sensitivity
 
         ballX += (targetX - ballX) * 0.8f
         ballForward += (targetForward - ballForward) * 0.8f
@@ -74,5 +77,9 @@ class MainViewModel (
 
     override fun onCleared() {
         accelerationSensor.stopListening()
+    }
+
+    fun setSensitivity(newSense: Float) {
+        sensitivity = newSense
     }
 }
