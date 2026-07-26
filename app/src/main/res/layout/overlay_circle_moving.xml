@@ -3,4 +3,4 @@
 <View xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="50dp"
     android:layout_height="50dp"
-    android:background="@drawable/moving_dot"/>
+    android:background="@drawable/moving_dot" />

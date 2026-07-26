@@ -1,20 +1,16 @@
 package com.example.carsicknessapp
 
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
-import android.graphics.Point
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.view.*
-import android.widget.FrameLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import android.content.res.Configuration
 
 class OverlayService : Service() {
 
@@ -47,28 +43,23 @@ class OverlayService : Service() {
     // -----------------------------
     private fun createOverlay() {
 
-        windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         val screenWidth: Int
         val screenHeight: Int
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val metrics = windowManager.currentWindowMetrics
-            val bounds = metrics.bounds
-            screenWidth = bounds.width()
-            screenHeight = bounds.height()
-        } else {
-            val display = windowManager.defaultDisplay
-            val size = Point()
-            display.getSize(size)
-            screenWidth = size.x
-            screenHeight = size.y
-        }
+
+        val metrics = windowManager.currentWindowMetrics
+        val bounds = metrics.bounds
+        screenWidth = bounds.width()
+        screenHeight = bounds.height()
+
 
         val count = 6
 
-        val leftX = screenWidth / 7
-        val rightX = screenWidth * 6 / 7
+        val fracFromEdge = 0.1f
+        val leftX = (screenWidth * fracFromEdge).toInt()
+        val rightX = (screenWidth * (1f-fracFromEdge)).toInt()
 
         val spacingY = screenHeight / (count + 1)
 
@@ -192,6 +183,20 @@ class OverlayService : Service() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        movingDots.forEach { windowManager.removeView(it) }
+        stationaryDots.forEach { windowManager.removeView(it) }
+
+        movingDots.clear()
+        stationaryDots.clear()
+        movingParams.clear()
+        movingBasePositions.clear()
+
+        createOverlay()
+    }
+
     // -----------------------------
     // FOREGROUND SERVICE (REQUIRED)
     // -----------------------------
@@ -232,6 +237,8 @@ class OverlayService : Service() {
 
         movingDots.clear()
         stationaryDots.clear()
+        movingParams.clear()
+        movingBasePositions.clear()
     }
 
 

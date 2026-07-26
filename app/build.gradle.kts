@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.carsicknessapp"
-        minSdk = 26
+        minSdk = 30
         //noinspection OldTargetApi
         targetSdk = 37
         versionCode = 1
@@ -35,6 +35,11 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    packaging {
+        resources {
+            excludes += "dump_syms/**"
+        }
     }
 }
 
